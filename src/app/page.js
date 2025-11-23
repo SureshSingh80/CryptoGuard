@@ -2,12 +2,14 @@
 
 import { useState } from "react";
 import CryptoJS from "crypto-js";
+import { Copy, Check } from "lucide-react";
 
 export default function Home() {
   const [text, setText] = useState("");
   const [key, setKey] = useState("");
   const [selected, setSelected] = useState("Encrypt");
   const [output, setOutput] = useState("");
+  const [copied,setCopied] = useState(false);
 
   const handleCryptoGrahpy = () => {
     if (text === "" || key === "") return;
@@ -24,19 +26,39 @@ export default function Home() {
     }
   };
 
+  const handleCopy = (value)=>{
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(value)
+      .then(() => {
+        setCopied(true);
+      })
+      .catch((err) => {
+        console.error('Clipboard copy failed:', err);
+        alert("Copy failed. Try manually.");
+      });
+  } else {
+    alert("Clipboard not supported in this environment.");
+  }
+
+    // Reset copied state after 2 seconds
+    setTimeout(() => {
+      setCopied(false);
+    }, 2000);
+  }
+
   return (
     <div
       style={{
         backgroundImage:
           "url('https://www.logsign.com/uploads/encryption_ff2b4dd67c.jpg')",
       }}
-      className="bg-gray-50 min-h-screen text-black flex items-center justify-center rounded-xl"
+      className="bg-gray-50 min-h-screen text-black flex items-center justify-center "
     >
-      <div className="bg-white p-8 rounded shadow">
-        <h1 className="text-2xl font-bold mb-4 text-center">
-          Welcome to the CryptoJS Decryption Tool
+      <div className="bg-white p-8  shadow mx-4 rounded-2xl">
+        <h1 className="text-xl md:text-2xl font-bold mb-4 text-center">
+          Welcome to the CryptoGuard Tool
         </h1>
-        <p className="text-base mb-4">
+        <p className="text-sm md:text-base mb-4 text-center">
           This tool allows you to decrypt and encrypted messages using the
           CryptoJS library.
         </p>
@@ -48,7 +70,7 @@ export default function Home() {
             required
             onChange={(e) => setText(e.target.value)}
             placeholder="Enter Text fro encryption or Decryption"
-            className="p-2 w-full border-2 border-gray-300 rounded focus:border-blue-400 focus:outline-none focus:ring-0"
+            className="p-1 md:p-2 w-full border-2 border-gray-300 rounded focus:border-blue-400 focus:outline-none focus:ring-0"
           />
         </div>
 
@@ -60,20 +82,20 @@ export default function Home() {
             required
             onChange={(e) => setKey(e.target.value)}
             placeholder="Enter Key"
-            className="p-2 w-full border-2 border-gray-300 rounded focus:border-blue-400 focus:outline-none focus:ring-0"
+            className="p-1 md:p-2 w-full border-2 border-gray-300 rounded focus:border-blue-400 focus:outline-none focus:ring-0"
           />
         </div>
 
         {/* selector */}
         <div className="p-4">
           <select
-            className="p-2 w-full border-2 border-gray-300 rounded 
+            className="p-1 md:p-2 w-full border-2 border-gray-300 rounded 
               focus:border-blue-400
               focus:outline-none 
               focus:ring-0 
               active:outline-none 
               active:ring-0 "
-              onChange={(e) => setSelected(e.target.value)}
+            onChange={(e) => setSelected(e.target.value)}
           >
             <option value="Encrypt">Encrypt</option>
             <option value="Decrypt">Decrypt</option>
@@ -81,16 +103,24 @@ export default function Home() {
         </div>
 
         {/* button */}
-        <div onClick={handleCryptoGrahpy} className="p-4 mt-8">
-          <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full ">
+        <div onClick={handleCryptoGrahpy} className="p-4 mt-0 md:mt-6">
+          <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-1 md:py-2 md:px-2 rounded w-full cursor-pointer ">
             {selected}
           </button>
         </div>
 
         {/* output */}
-        <div>
-          <h2 className="text-xl font-bold mb-4 text-center">Output:</h2>
-          <p className="text-center">{output}</p>
+        <div className="flex flex-col">
+          <h2 className="text-xl md:text-2xl font-bold mb-4 text-center">Output:</h2>
+          <p className="  w-[300px] overflow-scroll md:w-full md:overflow-auto">
+            {output && (
+              <span className="flex items-center">
+                <span className="mr-2 text-sm md:text-base">{output}</span>
+                <span>{copied ? <Check className="mr-2 ml-2" size={15} /> : <Copy className=" md:mr-2 md:ml-2 cursor-pointer" onClick={()=>handleCopy(output)} size={15} />}</span>
+              </span>
+            )}
+          </p>
+         
         </div>
       </div>
     </div>
